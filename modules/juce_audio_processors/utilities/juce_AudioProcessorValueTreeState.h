@@ -319,6 +319,7 @@ public:
                                                  const String& labelText,
                                                  NormalisableRange<float> valueRange,
                                                  float defaultValue,
+                                                 std::atomic<float> *valuePtr,
                                                  std::function<String (float)> valueToTextFunction,
                                                  std::function<float (const String&)> textToValueFunction,
                                                  bool isMetaParameter = false,
@@ -481,6 +482,7 @@ public:
                    const String& parameterName,
                    NormalisableRange<float> valueRange,
                    float defaultValue,
+                    std::atomic<float> *valuePtr,
                    const AudioProcessorValueTreeStateParameterAttributes& attributes = {});
 
         [[deprecated ("Prefer the signature taking an Attributes argument")]]
@@ -489,6 +491,7 @@ public:
                    const String& labelText,
                    NormalisableRange<float> valueRange,
                    float defaultParameterValue,
+                    std::atomic<float> *valuePtr,
                    std::function<String (float)> valueToTextFunction,
                    std::function<float (const String&)> textToValueFunction,
                    bool isMetaParameter = false,
@@ -500,6 +503,7 @@ public:
                          parameterName,
                          valueRange,
                          defaultParameterValue,
+                         valuePtr,
                          AudioProcessorValueTreeStateParameterAttributes().withLabel (labelText)
                                                                           .withStringFromValueFunction (adaptSignature (std::move (valueToTextFunction)))
                                                                           .withValueFromStringFunction (std::move (textToValueFunction))

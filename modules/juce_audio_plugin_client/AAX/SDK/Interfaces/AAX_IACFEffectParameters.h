@@ -828,7 +828,7 @@ public:
 	
 	/** @name Custom data methods
 	 *
-	 *  These functions exist as a proxiable way to move data between different modules (e.g. AAX_IEffectParameters and AAX_IEffectGUI.)  
+	 *  These functions exist as a proxiable way to move data between different modules (e.g. AAX_IEffectParameters and AAX_IEffectGUI.)
 	 *  Using these, the GUI can query any data through GetCustomData() with a plug-in defined \c typeID, \c void* and size.  This has an advantage
 	 *  over just sharing memory in that this function can work as a remote proxy as we enable those sorts of features later in the platform.
 	 *  Likewise, the GUI can also set arbitrary data on the data model by using the SetCustomData() function with the same idea.

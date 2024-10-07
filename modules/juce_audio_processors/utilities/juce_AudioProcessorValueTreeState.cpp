@@ -41,11 +41,13 @@ AudioProcessorValueTreeState::Parameter::Parameter (const ParameterID& parameter
                                                     const String& parameterName,
                                                     NormalisableRange<float> valueRange,
                                                     float defaultParameterValue,
+                                                    std::atomic<float> *valuePtr,
                                                     const AudioProcessorValueTreeStateParameterAttributes& attributes)
     : AudioParameterFloat (parameterID,
                            parameterName,
                            valueRange,
                            defaultParameterValue,
+                            valuePtr,
                            attributes.getAudioParameterFloatAttributes()),
       unsnappedDefault (valueRange.convertTo0to1 (defaultParameterValue)),
       discrete (attributes.getDiscrete()),
@@ -286,6 +288,7 @@ RangedAudioParameter* AudioProcessorValueTreeState::createAndAddParameter (const
                                                                            const String& labelText,
                                                                            NormalisableRange<float> range,
                                                                            float defaultVal,
+                                                                            std::atomic<float> *valuePtr,
                                                                            std::function<String (float)> valueToTextFunction,
                                                                            std::function<float (const String&)> textToValueFunction,
                                                                            bool isMetaParameter,
@@ -308,6 +311,7 @@ RangedAudioParameter* AudioProcessorValueTreeState::createAndAddParameter (const
                                                                paramName,
                                                                range,
                                                                defaultVal,
+                                                               valuePtr,
                                                                std::move (attributes)));
 }
 

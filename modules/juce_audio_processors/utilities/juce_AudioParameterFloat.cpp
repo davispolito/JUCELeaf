@@ -39,14 +39,16 @@ AudioParameterFloat::AudioParameterFloat (const ParameterID& idToUse,
                                           const String& nameToUse,
                                           NormalisableRange<float> r,
                                           float def,
+                                          std::atomic<float> *valuePtr,
                                           const AudioParameterFloatAttributes& attributes)
     : RangedAudioParameter (idToUse, nameToUse, attributes.getAudioProcessorParameterWithIDAttributes()),
       range (r),
-      value (def),
+      value (valuePtr),
       valueDefault (def),
       stringFromValueFunction (attributes.getStringFromValueFunction()),
       valueFromStringFunction (attributes.getValueFromStringFunction())
 {
+    *value = valueDefault;
     if (stringFromValueFunction == nullptr)
     {
         auto numDecimalPlacesToDisplay = [this]
@@ -81,8 +83,8 @@ AudioParameterFloat::AudioParameterFloat (const ParameterID& idToUse,
         valueFromStringFunction = [] (const String& text) { return text.getFloatValue(); };
 }
 
-AudioParameterFloat::AudioParameterFloat (const ParameterID& pid, const String& nm, float minValue, float maxValue, float def)
-   : AudioParameterFloat (pid, nm, { minValue, maxValue, 0.01f }, def)
+AudioParameterFloat::AudioParameterFloat (const ParameterID& pid, const String& nm, float minValue, float maxValue,std::atomic<float> *valuePtr, float def)
+   : AudioParameterFloat (pid, nm, { minValue, maxValue, 0.01f }, def, valuePtr)
 {
 }
 
@@ -94,8 +96,8 @@ AudioParameterFloat::~AudioParameterFloat()
     #endif
 }
 
-float AudioParameterFloat::getValue() const                              { return convertTo0to1 (value); }
-void AudioParameterFloat::setValue (float newValue)                      { value = convertFrom0to1 (newValue); valueChanged (get()); }
+float AudioParameterFloat::getValue() const                              { return convertTo0to1 (*value); }
+void AudioParameterFloat::setValue (float newValue)                      { *value = convertFrom0to1 (newValue); valueChanged (get()); }
 float AudioParameterFloat::getDefaultValue() const                       { return convertTo0to1 (valueDefault); }
 int AudioParameterFloat::getNumSteps() const                             { return AudioProcessorParameterWithID::getNumSteps(); }
 String AudioParameterFloat::getText (float v, int length) const          { return stringFromValueFunction (convertFrom0to1 (v), length); }
@@ -104,7 +106,7 @@ void AudioParameterFloat::valueChanged (float)                           {}
 
 AudioParameterFloat& AudioParameterFloat::operator= (float newValue)
 {
-    if (! approximatelyEqual ((float) value, newValue))
+    if (! approximatelyEqual ((float) *value, newValue))
         setValueNotifyingHost (convertTo0to1 (newValue));
 
     return *this;
