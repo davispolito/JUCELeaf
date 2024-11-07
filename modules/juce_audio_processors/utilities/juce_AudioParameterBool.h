@@ -74,6 +74,7 @@ public:
     AudioParameterBool (const ParameterID& parameterID,
                         const String& parameterName,
                         bool defaultValue,
+                        std::atomic<float> *valuePtr,
                         const AudioParameterBoolAttributes& attributes = {});
 
     /** Creates a AudioParameterBool with the specified parameters.
@@ -93,12 +94,14 @@ public:
     AudioParameterBool (const ParameterID& parameterID,
                         const String& parameterName,
                         bool defaultValue,
+                        std::atomic<float> *valuePtr,
                         const String& parameterLabel,
                         std::function<String (bool value, int maximumStringLength)> stringFromBool = nullptr,
                         std::function<bool (const String& text)> boolFromString = nullptr)
         : AudioParameterBool (parameterID,
                               parameterName,
                               defaultValue,
+                              valuePtr,
                               AudioParameterBoolAttributes().withLabel (parameterLabel)
                                                             .withStringFromValueFunction (std::move (stringFromBool))
                                                             .withValueFromStringFunction (std::move (boolFromString)))
@@ -109,7 +112,7 @@ public:
     ~AudioParameterBool() override;
 
     /** Returns the parameter's current boolean value. */
-    bool get() const noexcept          { return value >= 0.5f; }
+    bool get() const noexcept          { return *value >= 0.5f; }
 
     /** Returns the parameter's current boolean value. */
     operator bool() const noexcept     { return get(); }
@@ -138,7 +141,7 @@ private:
     float getValueForText (const String&) const override;
 
     const NormalisableRange<float> range { 0.0f, 1.0f, 1.0f };
-    std::atomic<float> value;
+    std::atomic<float>* value;
     const float valueDefault;
     std::function<String (bool, int)> stringFromBoolFunction;
     std::function<bool (const String&)> boolFromStringFunction;

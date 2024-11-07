@@ -38,9 +38,11 @@ namespace juce
 AudioParameterBool::AudioParameterBool (const ParameterID& idToUse,
                                         const String& nameToUse,
                                         bool def,
+                                        std::atomic<float> *valuePtr,
                                         const AudioParameterBoolAttributes& attributes)
     : RangedAudioParameter (idToUse, nameToUse, attributes.getAudioProcessorParameterWithIDAttributes()),
-      value (def ? 1.0f : 0.0f),
+      //value (def ? 1.0f : 0.0f),
+      value (valuePtr),
       valueDefault (def),
       stringFromBoolFunction (attributes.getStringFromValueFunction() != nullptr
                                   ? attributes.getStringFromValueFunction()
@@ -75,8 +77,8 @@ AudioParameterBool::~AudioParameterBool()
     #endif
 }
 
-float AudioParameterBool::getValue() const                               { return value; }
-void AudioParameterBool::setValue (float newValue)                       { value = newValue; valueChanged (get()); }
+float AudioParameterBool::getValue() const                               { return *value; }
+void AudioParameterBool::setValue (float newValue)                       { *value = newValue; valueChanged (get()); }
 float AudioParameterBool::getDefaultValue() const                        { return valueDefault; }
 int AudioParameterBool::getNumSteps() const                              { return 2; }
 bool AudioParameterBool::isDiscrete() const                              { return true; }
