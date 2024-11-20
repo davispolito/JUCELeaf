@@ -39,6 +39,7 @@ AudioParameterChoice::AudioParameterChoice (const ParameterID& idToUse,
                                             const String& nameToUse,
                                             const StringArray& c,
                                             int def,
+                                            std::atomic<float> *valuePtr,
                                             const AudioParameterChoiceAttributes& attributes)
    : RangedAudioParameter (idToUse, nameToUse, attributes.getAudioProcessorParameterWithIDAttributes()),
      choices (c),
@@ -51,7 +52,7 @@ AudioParameterChoice::AudioParameterChoice (const ParameterID& idToUse,
                 rangeWithInterval.interval = 1.0f;
                 return rangeWithInterval;
             }()),
-     value ((float) def),
+     value (valuePtr),
      defaultValue (convertTo0to1 ((float) def)),
      stringFromIndexFunction (attributes.getStringFromValueFunction() != nullptr
                                   ? attributes.getStringFromValueFunction()
@@ -71,8 +72,8 @@ AudioParameterChoice::~AudioParameterChoice()
     #endif
 }
 
-float AudioParameterChoice::getValue() const                             { return convertTo0to1 (value); }
-void AudioParameterChoice::setValue (float newValue)                     { value = convertFrom0to1 (newValue); valueChanged (getIndex()); }
+float AudioParameterChoice::getValue() const                             { return convertTo0to1 (*value); }
+void AudioParameterChoice::setValue (float newValue)                     { *value = convertFrom0to1 (newValue); valueChanged (getIndex()); }
 float AudioParameterChoice::getDefaultValue() const                      { return defaultValue; }
 int AudioParameterChoice::getNumSteps() const                            { return choices.size(); }
 bool AudioParameterChoice::isDiscrete() const                            { return true; }

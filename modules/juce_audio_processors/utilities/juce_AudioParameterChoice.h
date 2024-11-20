@@ -76,6 +76,7 @@ public:
                           const String& parameterName,
                           const StringArray& choices,
                           int defaultItemIndex,
+                          std::atomic<float> *valuePtr,
                           const AudioParameterChoiceAttributes& attributes = {});
 
     /** Creates a AudioParameterChoice with the specified parameters.
@@ -97,6 +98,7 @@ public:
                           const String& parameterName,
                           const StringArray& choicesToUse,
                           int defaultItemIndex,
+                          std::atomic<float> *valuePtr,
                           const String& parameterLabel,
                           std::function<String (int index, int maximumStringLength)> stringFromIndex = nullptr,
                           std::function<int (const String& text)> indexFromString = nullptr)
@@ -104,6 +106,7 @@ public:
                                 parameterName,
                                 choicesToUse,
                                 defaultItemIndex,
+                                valuePtr,
                                 AudioParameterChoiceAttributes().withLabel (parameterLabel)
                                                                 .withStringFromValueFunction (std::move (stringFromIndex))
                                                                 .withValueFromStringFunction (std::move (indexFromString)))
@@ -114,7 +117,7 @@ public:
     ~AudioParameterChoice() override;
 
     /** Returns the current index of the selected item. */
-    int getIndex() const noexcept                   { return roundToInt (value.load()); }
+    int getIndex() const noexcept                   { return roundToInt ((*value).load()); }
 
     /** Returns the current index of the selected item. */
     operator int() const noexcept                   { return getIndex(); }
@@ -151,7 +154,7 @@ private:
     float getValueForText (const String&) const override;
 
     const NormalisableRange<float> range;
-    std::atomic<float> value;
+    std::atomic<float>* value;
     const float defaultValue;
     std::function<String (int, int)> stringFromIndexFunction;
     std::function<int (const String&)> indexFromStringFunction;
