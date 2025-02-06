@@ -47,7 +47,6 @@ AudioProcessorValueTreeState::Parameter::Parameter (const ParameterID& parameter
                            parameterName,
                            valueRange,
                            defaultParameterValue,
-                            valuePtr,
                            attributes.getAudioParameterFloatAttributes()),
       unsnappedDefault (valueRange.convertTo0to1 (defaultParameterValue)),
       discrete (attributes.getDiscrete()),

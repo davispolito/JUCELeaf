@@ -77,7 +77,6 @@ public:
                          const String& parameterName,
                          NormalisableRange<float> normalisableRange,
                          float defaultValue,
-                         std::atomic<float> *valuePtr,
                          const AudioParameterFloatAttributes& attributes = {});
 
     /** Creates a AudioParameterFloat with the specified parameters.
@@ -100,7 +99,7 @@ public:
                          const String& parameterName,
                          NormalisableRange<float> normalisableRange,
                          float defaultValue,
-                        std::atomic<float> *valuePtr,
+
                          const String& parameterLabel,
                          Category parameterCategory = AudioProcessorParameter::genericParameter,
                          std::function<String (float value, int maximumStringLength)> stringFromValue = nullptr,
@@ -109,7 +108,6 @@ public:
                                parameterName,
                                std::move (normalisableRange),
                                defaultValue,
-                                valuePtr,
                                AudioParameterFloatAttributes().withLabel (parameterLabel)
                                                               .withCategory (parameterCategory)
                                                               .withStringFromValueFunction (std::move (stringFromValue))
@@ -126,17 +124,16 @@ public:
                          const String& parameterName,
                          float minValue,
                          float maxValue,
-                        std::atomic<float> *valuePtr,
                          float defaultValue);
 
     /** Destructor. */
     ~AudioParameterFloat() override;
 
     /** Returns the parameter's current value. */
-    float get() const noexcept                  { return *value; }
+    float get() const noexcept                  { return value; }
 
     /** Returns the parameter's current value. */
-    operator float() const noexcept             { return *value; }
+    operator float() const noexcept             { return value; }
 
     /** Changes the parameter's current value. */
     AudioParameterFloat& operator= (float newValue);
@@ -162,7 +159,7 @@ private:
     String getText (float, int) const override;
     float getValueForText (const String&) const override;
 
-    std::atomic<float>* value;
+    std::atomic<float> value;
     const float valueDefault;
     std::function<String (float, int)> stringFromValueFunction;
     std::function<float (const String&)> valueFromStringFunction;
